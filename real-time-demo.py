@@ -14,12 +14,11 @@ parser.add_argument("--latent", type=int, default=256, help='length of latent ve
 parser.add_argument("--vgg_dir", default='models/vgg_r41.pth', help='pre-trained encoder path')
 parser.add_argument("--decoder_dir", default='models/dec_r41.pth', help='pre-trained decoder path')
 parser.add_argument("--matrixPath", default='models/matrix_r41_new.pth', help='pre-trained model path')
-parser.add_argument("--style_image", type=str, default="Test/style/picasso_self_portrait.jpg", help="path to style image")
+parser.add_argument("--style_image", type=str, default="Test/style/picasso_self_portrait.jpg",
+                    help="path to style image")
 parser.add_argument("--record", type=int, default=0, help="set it to 1 for recording into video file")
 parser.add_argument("--demo-size", type=int, default=480, help="demo window height, default 480")
 opt = parser.parse_args()
-
-
 
 # Run the app
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
@@ -35,13 +34,13 @@ vgg.to(device)
 dec.to(device)
 matrix.to(device)
 
-def run_demo(args, ref, sF, mirror=False):
 
+def run_demo(args, ref, sF, mirror=False):
     # Define the codec and create VideoWriter object
     height = args.demo_size
-    width = int(4.0/3*args.demo_size)
-    swidth = int(width/4)
-    sheight = int(height/4)
+    width = int(4.0 / 3 * args.demo_size)
+    swidth = int(width / 4)
+    sheight = int(height / 4)
 
     cam = cv2.VideoCapture(0)
     cam.set(3, width)
@@ -72,13 +71,13 @@ def run_demo(args, ref, sF, mirror=False):
         simg = simg.transpose(1, 2, 0).astype('uint8')
 
         # display
-        ref = cv2.resize(ref,(swidth, sheight), interpolation = cv2.INTER_CUBIC)
-        cimg[0:sheight,0:swidth,:]=ref
+        ref = cv2.resize(ref, (swidth, sheight), interpolation=cv2.INTER_CUBIC)
+        cimg[0:sheight, 0:swidth, :] = ref
         simg = cv2.cvtColor(simg, cv2.COLOR_RGB2BGR)
         cimg = cv2.cvtColor(cimg, cv2.COLOR_RGB2BGR)
-        img = np.concatenate((cimg,simg),axis=1)
+        img = np.concatenate((cimg, simg), axis=1)
         cv2.imshow('MSG Demo', img)
-        #cv2.imwrite('stylized/%i.jpg'%idx,img)
+        # cv2.imwrite('stylized/%i.jpg'%idx,img)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
@@ -88,14 +87,15 @@ def run_demo(args, ref, sF, mirror=False):
 
 
 transform = transforms.Compose([
-    transforms.ToTensor(), # range [0, 255] -> [0.0,1.0]
-    ]
+    transforms.ToTensor(),  # range [0, 255] -> [0.0,1.0]
+]
 )
 style_transform = transforms.Compose([
     transforms.Resize((256, 256)),
-    transforms.ToTensor(), # range [0, 255] -> [0.0,1.0]
-    ]
+    transforms.ToTensor(),  # range [0, 255] -> [0.0,1.0]
+]
 )
+
 
 def main():
     vgg.eval()
@@ -110,6 +110,7 @@ def main():
     ref = ref.cpu().clamp(0, 255).data[0].numpy()
     ref = ref.transpose(1, 2, 0).astype('uint8')
     run_demo(opt, ref, sF['r41'], mirror=True)
+
 
 if __name__ == '__main__':
     main()

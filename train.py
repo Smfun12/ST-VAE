@@ -1,7 +1,6 @@
 import os
 import torch
 import argparse
-import torch.nn as nn
 import torch.optim as optim
 from data import get_training_set
 from libs.Matrix import MulLayer
@@ -27,7 +26,7 @@ parser.add_argument('--threads', type=int, default=6, help='number of threads fo
 parser.add_argument("--outf", default="output/", help='folder to output images and model checkpoints')
 parser.add_argument("--content_layers", default="r41", help='layers for content')
 parser.add_argument("--style_layers", default="r11,r21,r31,r41", help='layers for style')
-parser.add_argument("--batchSize", type=int,default=8, help='batch size')
+parser.add_argument("--batchSize", type=int, default=8, help='batch size')
 parser.add_argument("--lr", type=float, default=1e-4, help='learning rate')
 parser.add_argument("--content_weight", type=float, default=1.0, help='content loss weight')
 parser.add_argument("--style_weight", type=float, default=0.02, help='style loss weight, 0.02 for origin')
@@ -45,10 +44,10 @@ opt = parser.parse_args()
 opt.content_layers = opt.content_layers.split(',')
 opt.style_layers = opt.style_layers.split(',')
 opt.cuda = torch.cuda.is_available()
-if(opt.cuda):
+if (opt.cuda):
     torch.cuda.set_device(opt.gpu_id)
 
-os.makedirs(opt.outf,exist_ok=True)
+os.makedirs(opt.outf, exist_ok=True)
 cudnn.benchmark = True
 print_options(opt)
 
@@ -94,11 +93,12 @@ criterion = LossCriterion(opt.style_layers,
 optimizer = optim.Adam(matrix.parameters(), opt.lr)
 
 ################# GPU  #################
-if(opt.cuda):
+if (opt.cuda):
     vgg.cuda()
     dec.cuda()
     vgg5.cuda()
     matrix.cuda()
+
 
 ################# TRAINING #################
 
@@ -132,9 +132,13 @@ def train(epoch):
         loss.backward()
         optimizer.step()
 
-
-        print("===> Epoch[{}]({}/{}): loss: {:.4f} || content: {:.4f} || style: {:.4f} KL: {:.4f}.".format(epoch, iteration,
-                                                                                 len(training_data_loader), loss, contentLoss, styleLoss, KL_loss,))
+        print("===> Epoch[{}]({}/{}): loss: {:.4f} || content: {:.4f} || style: {:.4f} KL: {:.4f}.".format(epoch,
+                                                                                                           iteration,
+                                                                                                           len(training_data_loader),
+                                                                                                           loss,
+                                                                                                           contentLoss,
+                                                                                                           styleLoss,
+                                                                                                           KL_loss, ))
 
     print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(training_data_loader)))
 

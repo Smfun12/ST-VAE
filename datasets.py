@@ -1,8 +1,5 @@
 import torch.utils.data as data
 import torch
-import numpy as np
-import os
-from os import listdir
 from os.path import *
 from PIL import Image, ImageOps, ImageFile
 import random
@@ -11,6 +8,7 @@ import torchvision.transforms as transforms
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 Image.MAX_IMAGE_PIXELS = None
+
 
 def is_image_file(filename):
     return any(filename.endswith(extension) for extension in [".png", ".jpg", ".jpeg"])
@@ -24,9 +22,10 @@ def load_img(filepath):
 
 def rescale_img(img_in, scale):
     (w, h) = img_in.size
-    new_size_in = tuple([int(scale*w), int(scale*h)])
+    new_size_in = tuple([int(scale * w), int(scale * h)])
     img_in = img_in.resize(new_size_in, resample=Image.BICUBIC)
     return img_in
+
 
 def modcrop(im):
     (w, h) = im.size
@@ -35,14 +34,15 @@ def modcrop(im):
     # ih = h - new_h
     # iw = w - new_w
     if w >= h:
-        dl = (w - h)//2
+        dl = (w - h) // 2
         dr = w - h - dl
         ims = im.crop((dl, 0, w - dr, h))
     else:
-        dt = (h - w)//2
+        dt = (h - w) // 2
         db = h - w - dt
         ims = im.crop((0, dt, w, h - db))
     return ims
+
 
 def get_patch(img_in, img_tar, patch_size, scale, ix=-1, iy=-1):
     (ih, iw) = img_in.size
@@ -61,7 +61,7 @@ def get_patch(img_in, img_tar, patch_size, scale, ix=-1, iy=-1):
     img_in = img_in.crop((iy, ix, iy + ip, ix + ip))
     img_tar = img_tar.crop((ty, tx, ty + tp, tx + tp))
 
-    #info_patch = {
+    # info_patch = {
     #    'ix': ix, 'iy': iy, 'ip': ip, 'tx': tx, 'ty': ty, 'tp': tp}
 
     return img_in, img_tar
@@ -103,14 +103,16 @@ class StaticRandomCrop(object):
         self.w1 = random.randint(0, w - self.tw)
 
     def __call__(self, img):
-        return img[self.h1:(self.h1+self.th), self.w1:(self.w1+self.tw),:]
+        return img[self.h1:(self.h1 + self.th), self.w1:(self.w1 + self.tw), :]
+
 
 class StaticCenterCrop(object):
     def __init__(self, image_size, crop_size):
         self.th, self.tw = crop_size
         self.h, self.w = image_size
+
     def __call__(self, img):
-        return img[(self.h-self.th)//2:(self.h+self.th)//2, (self.w-self.tw)//2:(self.w+self.tw)//2,:]
+        return img[(self.h - self.th) // 2:(self.h + self.th) // 2, (self.w - self.tw) // 2:(self.w + self.tw) // 2, :]
 
 
 class DatasetFromFolder(data.Dataset):
@@ -134,9 +136,8 @@ class DatasetFromFolder(data.Dataset):
             # transforms.RandomVerticalFlip(),
             transforms.ToTensor()])
 
-
         self.input_filenames = sorted(glob(join(data_dir, '*.jpg')))
-        self.ref_filenames = sorted(glob(join(ref_dir, '*/*.jpg')))
+        self.ref_filenames = sorted(glob(join(ref_dir, '*.jpg')))
         self.ref_len = len(self.ref_filenames)
         self.input_len = len(self.input_filenames)
 
@@ -145,7 +146,6 @@ class DatasetFromFolder(data.Dataset):
         rand_no = torch.randint(0, self.ref_len, (1,)).item()
         ref = load_img(self.ref_filenames[rand_no])
 
-
         input = self.transform(input)
         ref = self.style_transform(ref)
 
@@ -153,10 +153,3 @@ class DatasetFromFolder(data.Dataset):
 
     def __len__(self):
         return self.input_len
-
-
-
-
-
-
-

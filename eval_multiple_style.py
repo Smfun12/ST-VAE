@@ -1,14 +1,10 @@
 from __future__ import print_function
 import argparse
 
-import os
 import torch
 import torchvision.transforms as transforms
 import numpy as np
-from os.path import join
-import time
-from PIL import Image, ImageOps
-from os import listdir
+from PIL import Image
 import os
 from libs.models import encoder4
 from libs.models import decoder4
@@ -28,7 +24,6 @@ print(opt)
 
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
-
 vgg = encoder4()
 dec = decoder4()
 matrix = MulLayer_4x(z_dim=opt.latent)
@@ -42,7 +37,6 @@ matrix.to(device)
 
 
 def eval(a, b):
-
     matrix.eval()
     vgg.eval()
     dec.eval()
@@ -61,22 +55,21 @@ def eval(a, b):
     for cont_file in os.listdir(content_path):
         content = Image.open(os.path.join(content_path, cont_file)).convert('RGB')
         content = transform(content).unsqueeze(0).to(device)
-        aa = a/5.0
-        bb = b/5.0
-        k = (1-aa)*(1 - bb)
-        l = bb*(1-aa)
-        m = aa*(1-bb)
-        n = aa*bb
+        aa = a / 5.0
+        bb = b / 5.0
+        k = (1 - aa) * (1 - bb)
+        l = bb * (1 - aa)
+        m = aa * (1 - bb)
+        n = aa * bb
         with torch.no_grad():
             prediction = chop_forward(k, l, m, n, content, ref_list)
 
         prediction = prediction * 255.0
         prediction = prediction.clamp(0, 255)
 
-        name = os.path.join(output_path + '/ms_'+str(a)+'_'+str(b)+'.png')
+        name = os.path.join(output_path + '/ms_' + str(a) + '_' + str(b) + '.png')
         print(name)
         Image.fromarray(np.uint8(prediction)).save(name)
-
 
 
 def test_transform(size, crop):
@@ -86,33 +79,31 @@ def test_transform(size, crop):
     if crop:
         transform_list.append(transforms.CenterCrop(size))
     transform_list.append(transforms.ToTensor())
-    transform =transforms.Compose(transform_list)
+    transform = transforms.Compose(transform_list)
 
     return transform
 
 
 transform = transforms.Compose([
-    transforms.ToTensor(), # range [0, 255] -> [0.0,1.0]
-    ]
+    transforms.ToTensor(),  # range [0, 255] -> [0.0,1.0]
+]
 )
 
 
 def chop_forward(k, l, m, n, content, ref):
-
     with torch.no_grad():
         sF_1 = vgg(ref[0])
         sF_2 = vgg(ref[1])
         sF_3 = vgg(ref[2])
         sF_4 = vgg(ref[3])
         cF = vgg(content)
-        feature, _ = matrix(k, l, m, n, cF[opt.layer], sF_1[opt.layer], sF_2[opt.layer], sF_3[opt.layer], sF_4[opt.layer])
+        feature, _ = matrix(k, l, m, n, cF[opt.layer], sF_1[opt.layer], sF_2[opt.layer], sF_3[opt.layer],
+                            sF_4[opt.layer])
         transfer = dec(feature)
 
         transfer = transfer.data[0].cpu().permute(1, 2, 0)
 
     return transfer
-
-
 
 
 ##Eval Start!!!!

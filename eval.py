@@ -1,14 +1,11 @@
 from __future__ import print_function
 import argparse
 
-import os
 import torch
-import torch.nn.functional as F
 import torchvision.transforms as transforms
 import numpy as np
-from os.path import join
 import time
-from PIL import Image, ImageOps
+from PIL import Image
 import os
 from libs.models import encoder4
 from libs.models import decoder4
@@ -31,7 +28,6 @@ print(opt)
 
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 
-
 vgg = encoder4()
 dec = decoder4()
 matrix = MulLayer(z_dim=opt.latent)
@@ -46,7 +42,6 @@ print('===> Loading datasets')
 
 
 def eval():
-
     matrix.eval()
     vgg.eval()
     dec.eval()
@@ -72,7 +67,7 @@ def eval():
                 prediction = prediction.data[0].cpu().permute(1, 2, 0)
 
             t1 = time.time()
-            #print("===> Processing: %s || Timer: %.4f sec." % (str(i), (t1 - t0)))
+            # print("===> Processing: %s || Timer: %.4f sec." % (str(i), (t1 - t0)))
 
             prediction = prediction * 255.0
             prediction = prediction.clamp(0, 255)
@@ -82,13 +77,10 @@ def eval():
             Image.fromarray(np.uint8(prediction)).save(save_name)
 
 
-
 transform = transforms.Compose([
-    transforms.ToTensor(), # range [0, 255] -> [0.0,1.0]
-    ]
+    transforms.ToTensor(),  # range [0, 255] -> [0.0,1.0]
+]
 )
-
-
 
 ##Eval Start!!!!
 eval()
