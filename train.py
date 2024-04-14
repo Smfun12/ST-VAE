@@ -53,7 +53,7 @@ print_options(opt)
 
 ################# DATA #################
 print('===> Loading datasets')
-train_set = get_training_set(opt.data_dir, opt.data_augmentation)
+train_set = get_training_set(opt.data_dir)
 training_data_loader = DataLoader(dataset=train_set, num_workers=opt.threads, batch_size=opt.batchSize, shuffle=True)
 
 ################# MODEL #################
