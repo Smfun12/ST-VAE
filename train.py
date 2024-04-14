@@ -106,9 +106,8 @@ def train(epoch):
     epoch_loss = 0
 
     for iteration, batch in enumerate(training_data_loader, 1):
-        content, target, style = Variable(batch[0]), Variable(batch[1]), Variable(batch[2])
+        content, style = Variable(batch[0]), Variable(batch[1])
         content = content.cuda()
-        target = target.cuda()
         style = style.cuda()
 
         optimizer.zero_grad()
