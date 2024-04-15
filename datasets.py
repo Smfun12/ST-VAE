@@ -137,7 +137,7 @@ class DatasetFromFolder(data.Dataset):
             transforms.ToTensor()])
 
         self.input_filenames = sorted(glob(join(data_dir, '*.jpg')))
-        self.ref_filenames = sorted(glob(join(ref_dir, '*.jpg')))
+        self.ref_filenames = sorted(glob(join(ref_dir, '*.jpeg')))
         self.ref_len = len(self.ref_filenames)
         self.input_len = len(self.input_filenames)
 
