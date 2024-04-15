@@ -162,5 +162,5 @@ for epoch in range(opt.start_iter, opt.nEpochs + 1):
 
         torch.save(matrix.state_dict(), '%s/matrix_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
         torch.save(vgg.state_dict(), '%s/vgg_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
-        torch.save(decoder4.state_dict(), '%s/dec_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
+        torch.save(dec.state_dict(), '%s/dec_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
         torch.save(vgg5.state_dict(), '%s/vgg5_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
