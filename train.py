@@ -160,4 +160,7 @@ for epoch in range(opt.start_iter, opt.nEpochs + 1):
         concat = torch.cat((content, style, transfer), dim=0)
         vutils.save_image(concat, '%s/%d.png' % (opt.outf, epoch), normalize=True, scale_each=True, nrow=opt.batchSize)
 
-        torch.save(matrix.state_dict(), '%s/%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
+        torch.save(matrix.state_dict(), '%s/matrix_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
+        torch.save(vgg.state_dict(), '%s/vgg_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
+        torch.save(decoder4.state_dict(), '%s/dec_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
+        torch.save(vgg5.state_dict(), '%s/vgg5_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
