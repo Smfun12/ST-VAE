@@ -1,4 +1,6 @@
 import os
+
+import numpy as np
 import torch
 import argparse
 import torch.optim as optim
@@ -141,11 +143,19 @@ def train(epoch):
 
     print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(training_data_loader)))
 
-    return content, style, transfer
+    return content, style, transfer, loss, styleLoss, contentLoss, KL_loss
 
 
+total_losses = []
+style_losses = []
+content_losses = []
+KL_losses = []
 for epoch in range(opt.start_iter, opt.nEpochs + 1):
-    content, style, transfer = train(epoch)
+    content, style, transfer, total_loss, style_loss, content_loss, KL_loss = train(epoch)
+    total_losses.append(total_loss)
+    style_losses.append(style_loss)
+    content_losses.append(content_loss)
+    KL_losses.append(KL_loss)
 
     # learning rate is decayed by a factor of 10 every half of total epochs
     if (epoch + 1) % 100 == 0:
@@ -164,3 +174,15 @@ for epoch in range(opt.start_iter, opt.nEpochs + 1):
         torch.save(vgg.state_dict(), '%s/vgg_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
         torch.save(dec.state_dict(), '%s/dec_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
         torch.save(vgg5.state_dict(), '%s/vgg5_%s_epoch_%d.pth' % (opt.outf, opt.layer, epoch))
+
+
+total_losses = np.array(total_losses)
+style_losses = np.array(style_losses)
+KL_losses = np.array(KL_losses)
+content_losses = np.array(content_losses)
+
+# Save the array to a file
+np.save('total_losses.npy', total_losses)
+np.save('style_losses.npy', style_losses)
+np.save('KL_losses.npy', KL_losses)
+np.save('content_losses.npy', content_losses)
