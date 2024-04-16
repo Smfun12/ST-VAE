@@ -49,32 +49,29 @@ def eval():
     output_path = os.path.join(opt.image_dataset, 'result')
     ref_path = os.path.join(opt.image_dataset, 'style')
 
-    for cont_file in os.listdir(content_path):
-        for ref_file in os.listdir(ref_path):
-            t0 = time.time()
-            content = Image.open(os.path.join(content_path, cont_file)).convert('RGB')
-            ref = Image.open(os.path.join(ref_path, ref_file)).convert('RGB')
+    for cont_dir in os.listdir(content_path):
+        for cont_file in os.listdir(cont_dir):
+            for ref_file in os.listdir(ref_path):
+                content = Image.open(os.path.join(content_path, cont_dir, cont_file)).convert('RGB')
+                ref = Image.open(os.path.join(ref_path, ref_file)).convert('RGB')
 
-            content = transform(content).unsqueeze(0).to(device)
-            ref = transform(ref).unsqueeze(0).to(device)
+                content = transform(content).unsqueeze(0).to(device)
+                ref = transform(ref).unsqueeze(0).to(device)
 
-            with torch.no_grad():
-                sF = vgg(ref)
-                cF = vgg(content)
-                feature, _, _ = matrix(cF['r41'], sF['r41'])
-                prediction = dec(feature)
+                with torch.no_grad():
+                    sF = vgg(ref)
+                    cF = vgg(content)
+                    feature, _, _ = matrix(cF['r41'], sF['r41'])
+                    prediction = dec(feature)
 
-                prediction = prediction.data[0].cpu().permute(1, 2, 0)
+                    prediction = prediction.data[0].cpu().permute(1, 2, 0)
 
-            t1 = time.time()
-            # print("===> Processing: %s || Timer: %.4f sec." % (str(i), (t1 - t0)))
+                prediction = prediction * 255.0
+                prediction = prediction.clamp(0, 255)
 
-            prediction = prediction * 255.0
-            prediction = prediction.clamp(0, 255)
-
-            file_name = cont_file.split('.')[0] + '_' + ref_file.split('.')[0] + '.jpg'
-            save_name = os.path.join(output_path, file_name)
-            Image.fromarray(np.uint8(prediction)).save(save_name)
+                file_name = cont_dir + '/' + cont_file.split('.')[0] + '_' + ref_file.split('.')[0] + '.jpg'
+                save_name = os.path.join(output_path, file_name)
+                Image.fromarray(np.uint8(prediction)).save(save_name)
 
 
 transform = transforms.Compose([
