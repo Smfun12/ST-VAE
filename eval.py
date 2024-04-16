@@ -70,6 +70,7 @@ def eval():
                 prediction = prediction.clamp(0, 255)
 
                 file_name = cont_dir + '/' + cont_file.split('.')[0] + '_' + ref_file.split('.')[0] + '.jpg'
+                os.mkdir(os.path.join(output_path, cont_dir))
                 save_name = os.path.join(output_path, file_name)
                 Image.fromarray(np.uint8(prediction)).save(save_name)
 
