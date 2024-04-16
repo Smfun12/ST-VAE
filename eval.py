@@ -50,7 +50,7 @@ def eval():
     ref_path = os.path.join(opt.image_dataset, 'style')
 
     for cont_dir in os.listdir(content_path):
-        for cont_file in os.listdir(cont_dir):
+        for cont_file in os.listdir(os.path.join(content_path, cont_dir)):
             for ref_file in os.listdir(ref_path):
                 content = Image.open(os.path.join(content_path, cont_dir, cont_file)).convert('RGB')
                 ref = Image.open(os.path.join(ref_path, ref_file)).convert('RGB')
