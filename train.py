@@ -152,10 +152,10 @@ content_losses = []
 KL_losses = []
 for epoch in range(opt.start_iter, opt.nEpochs + 1):
     content, style, transfer, total_loss, style_loss, content_loss, KL_loss = train(epoch)
-    total_losses.append(total_loss.cpu().numpy())
-    style_losses.append(style_loss.cpu().numpy())
-    content_losses.append(content_loss.cpu().numpy())
-    KL_losses.append(KL_loss.cpu().numpy())
+    total_losses.append(total_loss.detach().cpu().numpy())
+    style_losses.append(style_loss.detach().cpu().numpy())
+    content_losses.append(content_loss.detach().cpu().numpy())
+    KL_losses.append(KL_loss.detach().cpu().numpy())
 
     # learning rate is decayed by a factor of 10 every half of total epochs
     if (epoch + 1) % 100 == 0:
